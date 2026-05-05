@@ -167,30 +167,31 @@
                         <span id="resCoinStatus" class="text-xs font-black tracking-widest px-3 py-1 rounded-full border border-current"></span>
                     </div>
                     <p id="resSubStatus" class="text-lg font-bold mt-2 italic"></p>
-                    <p id="resDesc" class="text-slate-400 text-sm leading-relaxed mt-3"></p>
+                    <p id="resImpact" class="text-sm text-slate-400 mt-1 leading-snug"></p>
+                    <p id="resDesc" class="text-slate-500 text-sm leading-relaxed mt-3 border-t border-white/5 pt-3"></p>
                 </div>
 
-                <!-- Sisa Koin -->
-                <div class="glass-panel p-5 rounded-2xl flex items-center justify-between">
+                <!-- Sisa Koin + Lokasi -->
+                <div class="glass-panel p-5 rounded-2xl flex items-center justify-between gap-4">
                     <div>
                         <span class="text-[10px] font-black uppercase text-slate-500 block">Sisa Bekal</span>
                         <span id="resFinalCoins" class="text-3xl font-black"></span>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right flex-1">
                         <span class="text-[10px] font-black uppercase text-slate-500 block">Lokasi di Maket</span>
-                        <span id="resLocation" class="text-xs font-semibold text-slate-300 max-w-[180px] text-right leading-snug block"></span>
+                        <span id="resLocation" class="text-xs font-semibold text-slate-300 leading-snug block"></span>
                     </div>
                 </div>
 
-                <!-- Warna LEGO & Fokus -->
+                <!-- Warna Balok + Fokus -->
                 <div class="grid grid-cols-2 gap-3">
                     <div class="glass-panel p-4 rounded-2xl">
-                        <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Warna LEGO</span>
+                        <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Warna Balok</span>
                         <span id="resLego" class="text-sm font-black"></span>
                     </div>
                     <div class="glass-panel p-4 rounded-2xl">
                         <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Fokus</span>
-                        <span id="resLegoColor" class="text-sm font-black"></span>
+                        <span id="resLegoFocus" class="text-sm font-black"></span>
                     </div>
                 </div>
 
@@ -223,67 +224,103 @@
         // Biaya per pilihan — A paling mahal (konsumtif), D paling hemat (kolektif)
         const costs = { A: 10, B: 5, C: 3, D: 1 };
 
-        // Label perilaku koin per pilihan
+        // Warna balok LEGO per pilihan (hint di kartu jawaban)
         const coinBehavior = {
-            A: { label: "Spending", color: "#eab308", hint: "Konsumsi tinggi" },
-            B: { label: "Saving",   color: "#3b82f6", hint: "Keamanan finansial" },
-            C: { label: "Investing",color: "#a855f7", hint: "Pertumbuhan jangka panjang" },
-            D: { label: "Donating", color: "#ef4444", hint: "Kontribusi kolektif" }
+            A: { label: "Spending",  hint: "Konsumsi & Status",        surplusColor: "#ffffff", deficitColor: "#1a1a1a",  surplusLabel: "Putih (Solid)",        deficitLabel: "Hitam (Matte)"       },
+            B: { label: "Saving",    hint: "Keamanan & Estetika",      surplusColor: "#60a5fa", deficitColor: "#1e3a5f",  surplusLabel: "Biru (Transparan)",    deficitLabel: "Biru (Solid/Dull)"   },
+            C: { label: "Investing", hint: "Ketenangan & Pertumbuhan", surplusColor: "#c084fc", deficitColor: "#4a1d7a",  surplusLabel: "Ungu (Neon/Glow)",     deficitLabel: "Ungu (Gelap/Deep)"   },
+            D: { label: "Donating",  hint: "Kontribusi Kolektif",      surplusColor: "#f87171", deficitColor: "#7f1d1d",  surplusLabel: "Merah (Cerah)",        deficitLabel: "Merah (Maroon/Bata)" }
         };
 
-        // Data arketipe utama — termasuk lokasi maket
+        // Data arketipe — lengkap dengan warna balok, sub-status, dampak urban, profil perilaku koin
         const archetypes = {
             A: {
-                name: "The Savior", color: "#eab308", icon: "👑",
+                name: "The Savior", icon: "👑", color: "#eab308",
                 focus: "Stabilitas & Nilai Aset",
                 desc: "Anda memandang rumah sebagai pelindung nilai dan simbol keberhasilan hidup.",
                 location: "Zona Premium, Pusat Bisnis, atau Area Investasi",
-                surplus: { status: "The Urban Patron",    desc: "Memiliki modal besar dan aset yang aman. Cenderung menjadi penyedia hunian bagi orang lain." },
-                deficit: { status: "The Displaced Landlord", desc: "Terjebak dalam cicilan tinggi demi status. Memiliki rumah tapi kehilangan kendali atas hidup." }
+                surplus: {
+                    status:       "The Urban Patron",
+                    legoLabel:    "Putih (Solid)",
+                    legoColor:    "#ffffff",
+                    impact:       "Menjadi penyedia hunian/investor besar kota.",
+                    coinProfile:  "The Benevolent",
+                    coinDesc:     "Mengelola kepemilikan dengan bijak dan memberi ruang bagi orang lain."
+                },
+                deficit: {
+                    status:       "The Displaced Landlord",
+                    legoLabel:    "Hitam (Matte)",
+                    legoColor:    "#555555",
+                    impact:       "Memiliki properti tapi tercekik cicilan status.",
+                    coinProfile:  "The Tyrant",
+                    coinDesc:     "Merasa harus mengontrol segalanya meski sumber daya sudah habis."
+                }
             },
             B: {
-                name: "The Muse", color: "#3b82f6", icon: "💎",
+                name: "The Muse", icon: "💎", color: "#3b82f6",
                 focus: "Kreativitas & Sosial",
                 desc: "Bagi Anda, rumah adalah kanvas kreativitas dan pusat interaksi sosial yang dinamis.",
                 location: "Taman Vertikal, Fasilitas Publik, atau Area Co-living",
-                surplus: { status: "The Trendsetter",     desc: "Hidup estetik dengan modal yang cukup. Menjadi kiblat gaya hidup mikro yang premium." },
-                deficit: { status: "The Aesthetic Hoarder", desc: "Mengalihkan stres finansial ke barang konsumtif. Ruang sempit yang penuh barang namun koin kosong." }
+                surplus: {
+                    status:       "The Trendsetter",
+                    legoLabel:    "Biru (Transparan)",
+                    legoColor:    "#60a5fa",
+                    impact:       "Penggerak ekonomi kreatif berbasis hunian.",
+                    coinProfile:  "The Connoisseur",
+                    coinDesc:     "Menikmati kualitas tanpa boros — pengeluaran terencana dan bermakna."
+                },
+                deficit: {
+                    status:       "The Aesthetic Hoarder",
+                    legoLabel:    "Biru (Solid/Dull)",
+                    legoColor:    "#1e3a5f",
+                    impact:       "Ruang sempit yang penuh barang konsumsi.",
+                    coinProfile:  "The Hedonist",
+                    coinDesc:     "Terjebak siklus konsumsi sesaat yang menguras masa depan."
+                }
             },
             C: {
-                name: "The Poet", color: "#a855f7", icon: "🌿",
+                name: "The Poet", icon: "🌿", color: "#a855f7",
                 focus: "Kemanusiaan & Waktu",
                 desc: "Anda memprioritaskan pemulihan jiwa dan kedaulatan waktu di atas luas bangunan.",
                 location: "Zona Transit (TOD), Dekat Stasiun, atau Ruang Teduh",
-                surplus: { status: "The Mindful Commuter", desc: "Berhasil menyeimbangkan jarak dan biaya. Memiliki waktu luang untuk hobi dan keluarga." },
-                deficit: { status: "The Urban Ghost",      desc: "Kelelahan kronis karena jarak. Hampir tidak memiliki waktu untuk interaksi sosial — hanya tidur dan kerja." }
+                surplus: {
+                    status:       "The Mindful Commuter",
+                    legoLabel:    "Ungu (Neon/Glow)",
+                    legoColor:    "#c084fc",
+                    impact:       "Berhasil 'membeli' waktu dengan lokasi cerdas.",
+                    coinProfile:  "The Guardian",
+                    coinDesc:     "Disiplin menjaga cadangan masa depan tanpa mengorbankan kualitas hidup."
+                },
+                deficit: {
+                    status:       "The Urban Ghost",
+                    legoLabel:    "Ungu (Gelap/Deep)",
+                    legoColor:    "#4a1d7a",
+                    impact:       "Kelelahan kronis karena jarak dan biaya transit.",
+                    coinProfile:  "The Miser",
+                    coinDesc:     "Terpenjara oleh ketakutan kehilangan — peluang berlalu tanpa diambil."
+                }
             },
             D: {
-                name: "The Mage", color: "#f8fafc", icon: "☯️",
+                name: "The Mage", icon: "☯️", color: "#ef4444",
                 focus: "Sistem & Inovasi",
                 desc: "Anda adalah pemikir sistemik yang mendambakan efisiensi dan kesetaraan dalam hunian.",
                 location: "Struktur Radikal, Infill Building, atau Jembatan Penghubung",
-                surplus: { status: "The Architect of Justice", desc: "Memiliki sumber daya untuk merancang sistem baru. Berfokus pada inovasi teknologi perkotaan." },
-                deficit: { status: "The Radical Reformer",    desc: "Sadar sistem ini rusak karena ia adalah korbannya. Ingin meruntuhkan struktur kepemilikan lama." }
-            }
-        };
-
-        // Skema Perilaku Koin: 4 warna × surplus/defisit = 8 karakter
-        const coinProfiles = {
-            A: { // Kuning — Spending
-                surplus: { name: "The Connoisseur", tag: "Elegan",   desc: "Kamu tahu kapan harus menikmati hidup tanpa menghabiskan segalanya. Pengeluaranmu terencana dan membawa kualitas." },
-                deficit: { name: "The Hedonist",    tag: "Impulsif", desc: "Kamu membiarkan keinginan sesaat menguras masa depanmu. Terjebak dalam siklus konsumsi yang tak berujung." }
-            },
-            B: { // Biru — Saving
-                surplus: { name: "The Guardian", tag: "Bijak", desc: "Kamu memiliki disiplin luar biasa dalam menjaga sumber daya. Kamu siap menghadapi badai apa pun." },
-                deficit: { name: "The Miser",    tag: "Pelit", desc: "Kamu kehilangan banyak kesempatan karena terlalu takut mengeluarkan koin. Tabunganmu adalah penjara bagimu." }
-            },
-            C: { // Ungu — Investing
-                surplus: { name: "The Strategist", tag: "Visi",   desc: "Setiap koin yang keluar kembali dengan nilai lebih. Kamu membangun fondasi kuat untuk pertumbuhan jangka panjang." },
-                deficit: { name: "The Gambler",    tag: "Nekat",  desc: "Kamu memaksakan investasi pada hal yang tidak kamu mengerti. Terlalu berambisi hingga lupa menjaga kebutuhan dasar." }
-            },
-            D: { // Merah — Donating
-                surplus: { name: "The Philanthropist", tag: "Tulus",    desc: "Kamu memberi dari kelimpahanmu. Kamu membantu orang lain tanpa melukai dirimu sendiri." },
-                deficit: { name: "The Martyr",          tag: "Memaksa", desc: "Kamu memberikan apa yang sebenarnya tidak sanggup kamu berikan. Kebaikanmu adalah bentuk pengabaian diri yang berbahaya." }
+                surplus: {
+                    status:       "Architect of Justice",
+                    legoLabel:    "Merah (Cerah)",
+                    legoColor:    "#f87171",
+                    impact:       "Merancang sistem baru yang lebih adil.",
+                    coinProfile:  "The Strategist",
+                    coinDesc:     "Membangun aset dengan perhitungan matang untuk pertumbuhan jangka panjang."
+                },
+                deficit: {
+                    status:       "Radical Reformer",
+                    legoLabel:    "Merah (Maroon/Bata)",
+                    legoColor:    "#7f1d1d",
+                    impact:       "Sadar sistem rusak karena menjadi korbannya.",
+                    coinProfile:  "The Gambler",
+                    coinDesc:     "Bertaruh tanpa menjaga kebutuhan dasar — ambisi melampaui sumber daya."
+                }
             }
         };
 
@@ -457,62 +494,54 @@
             const remaining = initialDeposit - totalSpent;
             const isSurplus = remaining > 0;
 
-            // Tentukan arketipe dominan
+            // Arketipe dominan
             let top = 'A';
             for (let k in score) if (score[k] > score[top]) top = k;
             const arch = archetypes[top];
-            const subStatus = isSurplus ? arch.surplus : arch.deficit;
+            const sub  = isSurplus ? arch.surplus : arch.deficit;
 
-            // Tentukan profil perilaku koin (berdasarkan jawaban dominan = sama dengan arketipe)
-            const coinProf = isSurplus ? coinProfiles[top].surplus : coinProfiles[top].deficit;
-            const coinBeh  = coinBehavior[top];
+            // Populate semua elemen hasil
+            const set = (id, text, color) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (text !== undefined) el.innerText = text;
+                if (color) el.style.color = color;
+            };
 
-            // Warna LEGO berdasarkan warna perilaku
-            const legoColors = { A: "Kuning", B: "Biru", C: "Ungu", D: "Merah" };
+            set('resIcon',       arch.icon);
+            set('resTitle',      arch.name,         arch.color);
+            set('resSubStatus',  sub.status,         isSurplus ? '#22c55e' : '#ef4444');
+            set('resDesc',       arch.desc);
+            set('resFinalCoins', remaining + ' ₿',  isSurplus ? '#eab308' : '#ef4444');
+            set('resCoinStatus', isSurplus ? '✦ SURPLUS' : '✦ DEFISIT', isSurplus ? '#22c55e' : '#ef4444');
+            set('resLocation',   arch.location);
+            set('resImpact',     sub.impact);
+            set('resLego',       sub.legoLabel,      sub.legoColor);
+            set('resLegoFocus',  arch.focus,         arch.color);
+            set('resCoinProfile', sub.coinProfile,   sub.legoColor);
+            set('resCoinDesc',   sub.coinDesc);
 
-            const elIcon    = document.getElementById('resIcon');
-            const elTitle   = document.getElementById('resTitle');
-            const elSubStatus = document.getElementById('resSubStatus');
-            const elDesc    = document.getElementById('resDesc');
-            const elCoins   = document.getElementById('resFinalCoins');
-            const elCoinStatus = document.getElementById('resCoinStatus');
-            const elLocation = document.getElementById('resLocation');
-            const elLego    = document.getElementById('resLego');
-            const elLegoColor = document.getElementById('resLegoColor');
-            const elCoinProfile = document.getElementById('resCoinProfile');
-            const elCoinDesc = document.getElementById('resCoinDesc');
-            const elStats   = document.getElementById('resStats');
-            const elOverlay = document.getElementById('resultOverlay');
-
-            if (elIcon) elIcon.innerText = arch.icon;
-            if (elTitle) { elTitle.innerText = arch.name; elTitle.style.color = arch.color; }
-            if (elSubStatus) { elSubStatus.innerText = subStatus.status; elSubStatus.style.color = isSurplus ? '#22c55e' : '#ef4444'; }
-            if (elDesc) elDesc.innerText = subStatus.desc;
-            if (elCoins) { elCoins.innerText = remaining + " ₿"; elCoins.style.color = isSurplus ? '#eab308' : '#ef4444'; }
-            if (elCoinStatus) { elCoinStatus.innerText = isSurplus ? "✦ SURPLUS" : "✦ DEFISIT"; elCoinStatus.style.color = isSurplus ? '#22c55e' : '#ef4444'; }
-            if (elLocation) elLocation.innerText = arch.location;
-            if (elLego) { elLego.innerText = legoColors[top]; elLego.style.color = coinBeh.color; }
-            if (elLegoColor) { elLegoColor.innerText = arch.focus; elLegoColor.style.color = arch.color; }
-            if (elCoinProfile) { elCoinProfile.innerText = coinProf.name + " · " + coinProf.tag; elCoinProfile.style.color = coinBeh.color; }
-            if (elCoinDesc) elCoinDesc.innerText = coinProf.desc;
-
+            // Score bars
+            const elStats = document.getElementById('resStats');
             if (elStats) {
                 elStats.innerHTML = Object.entries(score).map(([k, v]) => {
+                    const a = archetypes[k];
                     const beh = coinBehavior[k];
                     return `
                     <div class="space-y-1">
-                        <div class="flex justify-between text-[10px] font-bold uppercase tracking-[0.2em]">
-                            <span style="color:${archetypes[k].color}">${archetypes[k].name}</span>
-                            <span class="text-slate-500">${v} jawaban · ${Math.round((v/questions.length)*100)}%</span>
+                        <div class="flex justify-between text-[10px] font-bold uppercase tracking-[0.15em]">
+                            <span style="color:${a.color}">${a.name}</span>
+                            <span class="text-slate-500">${v} jwb · ${Math.round((v/questions.length)*100)}%</span>
                         </div>
                         <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full transition-all duration-700" style="width:${(v/questions.length)*100}%;background:${archetypes[k].color}"></div>
+                            <div class="h-full rounded-full" style="width:${(v/questions.length)*100}%;background:${a.color}"></div>
                         </div>
-                        <div class="text-[9px] font-semibold" style="color:${beh.color}88">${beh.label} · -${costs[k]}₿/jawaban</div>
+                        <div class="text-[9px] font-semibold text-slate-600">${beh.label} · -${costs[k]}₿/jawaban</div>
                     </div>`;
                 }).join('');
             }
 
+            const elOverlay = document.getElementById('resultOverlay');
             if (elOverlay) {
                 elOverlay.classList.remove('hidden');
                 elOverlay.setAttribute('tabindex', '-1');
