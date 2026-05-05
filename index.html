@@ -67,27 +67,42 @@
         .floating {
             animation: float 4s ease-in-out infinite;
         }
+
+        /* Mobile tap improvements */
+        label.card-interaction {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        button {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        @media (max-width: 1024px) {
+            .card-interaction:hover {
+                transform: none;
+            }
+        }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center p-4 lg:p-8">
+<body class="min-h-screen flex items-start lg:items-center justify-center p-3 sm:p-4 lg:p-8">
 
     <!-- Overlay Start -->
-    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md">
-        <div class="max-w-xl w-full p-12 text-center space-y-8 glass-panel rounded-[3rem]">
-            <div class="inline-block p-6 bg-yellow-500/10 rounded-full floating">
-                <span class="text-6xl">₿</span>
+    <div id="startScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+        <div class="max-w-xl w-full p-8 sm:p-12 text-center space-y-6 sm:space-y-8 glass-panel rounded-[2rem] sm:rounded-[3rem]">
+            <div class="inline-block p-4 sm:p-6 bg-yellow-500/10 rounded-full floating">
+                <span class="text-5xl sm:text-6xl">₿</span>
             </div>
             <div class="space-y-2">
-                <h1 class="text-5xl font-black tracking-tighter italic uppercase">Urban Journey</h1>
-                <p class="text-slate-400 text-lg">Simulasi pengalokasian bekal untuk hunian masa depan Jakarta.</p>
+                <h1 class="text-4xl sm:text-5xl font-black tracking-tighter italic uppercase">Urban Journey</h1>
+                <p class="text-slate-400 text-base sm:text-lg">Simulasi pengalokasian bekal untuk hunian masa depan Jakarta.</p>
             </div>
             <div class="max-w-xs mx-auto space-y-4">
                 <div class="text-left">
                     <label class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 block ml-2">Jumlah Bekal Awal</label>
                     <input type="number" id="initialDeposit" value="100" 
-                        class="w-full bg-slate-900 border border-white/10 p-5 rounded-2xl text-center text-3xl font-black text-yellow-500 outline-none focus:border-yellow-500 transition-colors">
+                        class="w-full bg-slate-900 border border-white/10 p-4 sm:p-5 rounded-2xl text-center text-2xl sm:text-3xl font-black text-yellow-500 outline-none focus:border-yellow-500 transition-colors" aria-label="Jumlah bekal awal dalam koin">
                 </div>
-                <button onclick="startGame()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl shadow-2xl shadow-blue-900/20 active:scale-95 transition-all text-lg uppercase">
+                <button onclick="startGame()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 sm:py-5 rounded-2xl shadow-2xl shadow-blue-900/20 active:scale-95 transition-all text-base sm:text-lg uppercase">
                     Mulai Ekspedisi
                 </button>
             </div>
@@ -95,10 +110,24 @@
     </div>
 
     <!-- Main Dashboard UI -->
-    <div id="mainDashboard" class="hidden w-full h-full max-w-7xl flex flex-col lg:flex-row gap-6 opacity-0 transition-opacity duration-700">
+    <div id="mainDashboard" class="hidden w-full max-w-7xl flex flex-col lg:flex-row gap-4 lg:gap-6 opacity-0 transition-opacity duration-700 lg:h-[calc(100vh-4rem)]">
         
+        <!-- Mobile sticky coin+progress bar -->
+        <div class="lg:hidden sticky top-0 z-30 glass-panel rounded-2xl p-4 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <div id="coinStatusDotMobile" class="w-2 h-2 rounded-full bg-green-500 animate-pulse shrink-0"></div>
+                <span class="text-[10px] font-black uppercase text-slate-500">Bekal</span>
+                <span id="currentCoinsMobile" class="text-xl font-black text-yellow-500">0</span>
+                <span class="text-sm font-bold text-yellow-500/50">&#x20BF;</span>
+            </div>
+            <div class="flex-1 max-w-[140px]">
+                <div class="flex justify-between text-[9px] font-black uppercase text-slate-500 mb-1"><span>Progress</span><span id="progressTextMobile">0/20</span></div>
+                <div class="w-full h-1.5 bg-slate-800/50 rounded-full overflow-hidden"><div id="progressBarMobile" class="h-full bg-blue-500 progress-glow transition-all duration-500" style="width:0%"></div></div>
+            </div>
+            <div id="sectionBadgeMobile" class="px-2 py-1 bg-blue-500/10 text-blue-400 text-[9px] font-black rounded-full border border-blue-500/20 uppercase tracking-wider shrink-0">&#8212;</div>
+        </div>
         <!-- Sidebar Statistics -->
-        <aside class="lg:w-80 flex flex-col gap-6">
+        <aside class="hidden lg:flex lg:w-80 flex-col gap-6">
             <!-- Coin Status -->
             <div class="glass-panel p-8 rounded-[2.5rem] relative overflow-hidden group">
                 <div class="relative z-10">
@@ -122,7 +151,7 @@
                     <div id="archetypePreview" class="mt-6 text-center space-y-4">
                         <div id="archIcon" class="text-7xl">🏙️</div>
                         <h3 id="archName" class="text-2xl font-black italic text-slate-700">Menganalisis...</h3>
-                        <p id="archStatus" class="text-xs text-slate-500 leading-relaxed">Jawab setidaknya 5 pertanyaan untuk melihat kecenderungan arketipe Anda.</p>
+                        <p id="archStatus" class="text-xs text-slate-500 leading-relaxed">Jawab setidaknya 5 pertanyaan untuk melihat kecenderungan arketipe milikmu.</p>
                     </div>
                 </div>
 
@@ -140,76 +169,76 @@
         </aside>
 
         <!-- Question Area -->
-        <main class="flex-1 glass-panel rounded-[2.5rem] overflow-hidden flex flex-col">
-            <div class="p-8 border-b border-white/5 bg-slate-900/40 flex justify-between items-center">
-                <h2 class="text-xl font-black uppercase italic tracking-wider">Log Perjalanan Urban</h2>
+        <main class="flex-1 glass-panel rounded-[2.5rem] flex flex-col min-h-0">
+            <div class="p-4 sm:p-6 lg:p-8 border-b border-white/5 bg-slate-900/40 flex justify-between items-center">
+                <h2 class="text-sm sm:text-base lg:text-xl font-black uppercase italic tracking-wider">Log Perjalanan Urban</h2>
                 <div id="sectionBadge" class="px-4 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-black rounded-full border border-blue-500/20 uppercase tracking-widest">
                     Inisialisasi
                 </div>
             </div>
             
-            <div id="questionsScroll" class="flex-1 overflow-y-auto p-8 lg:p-12 space-y-12 scroll-hide">
+            <div id="questionsScroll" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-12 space-y-8 sm:space-y-10 lg:space-y-12 scroll-hide">
                 <!-- Content injected here -->
             </div>
         </main>
     </div>
 
     <!-- Result Modal (Fullscreen) -->
-    <div id="resultOverlay" class="hidden fixed inset-0 z-[60] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-6 overflow-y-auto">
-        <div class="max-w-5xl w-full grid lg:grid-cols-2 gap-8 py-8">
+    <div id="resultOverlay" class="hidden fixed inset-0 z-[60] bg-slate-950/95 backdrop-blur-xl flex items-start justify-center p-4 sm:p-6 overflow-y-auto">
+        <div class="max-w-5xl w-full grid lg:grid-cols-2 gap-5 sm:gap-8 py-6 sm:py-8">
 
             <!-- LEFT: Archetype Result -->
-            <div class="space-y-5">
+            <div class="space-y-4 sm:space-y-5">
                 <div class="text-center lg:text-left">
-                    <div id="resIcon" class="text-8xl mb-3 floating inline-block"></div>
-                    <div class="flex items-baseline gap-3 flex-wrap">
-                        <h1 id="resTitle" class="text-5xl font-black italic uppercase leading-none"></h1>
-                        <span id="resCoinStatus" class="text-xs font-black tracking-widest px-3 py-1 rounded-full border border-current"></span>
+                    <div id="resIcon" class="text-6xl sm:text-8xl mb-2 sm:mb-3 floating inline-block"></div>
+                    <div class="flex items-baseline gap-2 sm:gap-3 flex-wrap">
+                        <h1 id="resTitle" class="text-3xl sm:text-5xl font-black italic uppercase leading-none"></h1>
+                        <span id="resCoinStatus" class="text-[10px] sm:text-xs font-black tracking-widest px-2 sm:px-3 py-1 rounded-full border border-current"></span>
                     </div>
-                    <p id="resSubStatus" class="text-lg font-bold mt-2 italic"></p>
-                    <p id="resImpact" class="text-sm text-slate-400 mt-1 leading-snug"></p>
-                    <p id="resDesc" class="text-slate-500 text-sm leading-relaxed mt-3 border-t border-white/5 pt-3"></p>
+                    <p id="resSubStatus" class="text-base sm:text-lg font-bold mt-2 italic"></p>
+                    <p id="resImpact" class="text-xs sm:text-sm text-slate-400 mt-1 leading-snug"></p>
+                    <p id="resDesc" class="text-slate-500 text-xs sm:text-sm leading-relaxed mt-3 border-t border-white/5 pt-3"></p>
                 </div>
 
                 <!-- Sisa Koin + Lokasi -->
-                <div class="glass-panel p-5 rounded-2xl flex items-center justify-between gap-4">
+                <div class="glass-panel p-4 sm:p-5 rounded-2xl flex items-center justify-between gap-3 sm:gap-4">
                     <div>
                         <span class="text-[10px] font-black uppercase text-slate-500 block">Sisa Bekal</span>
-                        <span id="resFinalCoins" class="text-3xl font-black"></span>
+                        <span id="resFinalCoins" class="text-2xl sm:text-3xl font-black"></span>
                     </div>
                     <div class="text-right flex-1">
                         <span class="text-[10px] font-black uppercase text-slate-500 block">Lokasi di Maket</span>
-                        <span id="resLocation" class="text-xs font-semibold text-slate-300 leading-snug block"></span>
+                        <span id="resLocation" class="text-[11px] sm:text-xs font-semibold text-slate-300 leading-snug block"></span>
                     </div>
                 </div>
 
                 <!-- Warna Balok + Fokus -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="glass-panel p-4 rounded-2xl">
+                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl">
                         <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Warna Balok</span>
-                        <span id="resLego" class="text-sm font-black"></span>
+                        <span id="resLego" class="text-xs sm:text-sm font-black"></span>
                     </div>
-                    <div class="glass-panel p-4 rounded-2xl">
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl">
                         <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Fokus</span>
-                        <span id="resLegoFocus" class="text-sm font-black"></span>
+                        <span id="resLegoFocus" class="text-xs sm:text-sm font-black"></span>
                     </div>
                 </div>
 
                 <!-- Profil Perilaku Koin -->
-                <div class="glass-panel p-5 rounded-2xl border border-white/5">
+                <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-white/5">
                     <span class="text-[10px] font-black uppercase text-slate-500 block mb-1">Profil Perilaku Koin</span>
-                    <p id="resCoinProfile" class="text-base font-black mb-2"></p>
+                    <p id="resCoinProfile" class="text-sm sm:text-base font-black mb-2"></p>
                     <p id="resCoinDesc" class="text-xs text-slate-400 leading-relaxed"></p>
                 </div>
             </div>
 
             <!-- RIGHT: Score Distribution -->
-            <div class="glass-panel p-8 rounded-[2.5rem] space-y-6 flex flex-col justify-between">
+            <div class="glass-panel p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] space-y-5 sm:space-y-6 flex flex-col justify-between">
                 <div>
-                    <h4 class="text-sm font-black uppercase tracking-widest text-center text-slate-500 mb-6">Distribusi Mentalitas</h4>
-                    <div id="resStats" class="space-y-5"></div>
+                    <h4 class="text-xs sm:text-sm font-black uppercase tracking-widest text-center text-slate-500 mb-4 sm:mb-6">Distribusi Mentalitas</h4>
+                    <div id="resStats" class="space-y-4 sm:space-y-5"></div>
                 </div>
-                <button onclick="window.location.reload()" class="w-full py-4 bg-white text-slate-950 font-black rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-sm mt-4">
+                <button onclick="window.location.reload()" class="w-full py-3 sm:py-4 bg-white text-slate-950 font-black rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-xs sm:text-sm mt-4">
                     Ulangi Perjalanan
                 </button>
             </div>
@@ -237,8 +266,8 @@
             A: {
                 name: "The Savior", icon: "👑", color: "#eab308",
                 focus: "Stabilitas & Nilai Aset",
-                desc: "Anda memandang rumah sebagai pelindung nilai dan simbol keberhasilan hidup.",
-                location: "Zona Premium, Pusat Bisnis, atau Area Investasi",
+                desc: "Kamu  memandang rumah sebagai pelindung nilai dan simbol keberhasilan hidup.",
+                location: "Zona High-Value / Sky-Garden, Pusat Bisnis, atau Area Investasi",
                 surplus: {
                     status:       "The Urban Patron",
                     legoLabel:    "Putih (Solid)",
@@ -259,8 +288,8 @@
             B: {
                 name: "The Muse", icon: "💎", color: "#3b82f6",
                 focus: "Kreativitas & Sosial",
-                desc: "Bagi Anda, rumah adalah kanvas kreativitas dan pusat interaksi sosial yang dinamis.",
-                location: "Taman Vertikal, Fasilitas Publik, atau Area Co-living",
+                desc: "Bagimu, rumah adalah kanvas kreativitas dan pusat interaksi sosial yang dinamis.",
+                location: "Zona Sosial, Taman Vertikal, Fasilitas Publik, atau Area Co-living",
                 surplus: {
                     status:       "The Trendsetter",
                     legoLabel:    "Biru (Transparan)",
@@ -281,14 +310,14 @@
             C: {
                 name: "The Poet", icon: "🌿", color: "#a855f7",
                 focus: "Kemanusiaan & Waktu",
-                desc: "Anda memprioritaskan pemulihan jiwa dan kedaulatan waktu di atas luas bangunan.",
+                desc: "Kamu memprioritaskan pemulihan jiwa dan kedaulatan waktu di atas luas bangunan.",
                 location: "Zona Transit (TOD), Dekat Stasiun, atau Ruang Teduh",
                 surplus: {
                     status:       "The Mindful Commuter",
                     legoLabel:    "Ungu (Neon/Glow)",
                     legoColor:    "#c084fc",
                     impact:       "Berhasil 'membeli' waktu dengan lokasi cerdas.",
-                    coinProfile:  "The Guardian",
+                    coinProfile:  "The Mindful",
                     coinDesc:     "Disiplin menjaga cadangan masa depan tanpa mengorbankan kualitas hidup."
                 },
                 deficit: {
@@ -303,8 +332,8 @@
             D: {
                 name: "The Mage", icon: "☯️", color: "#ef4444",
                 focus: "Sistem & Inovasi",
-                desc: "Anda adalah pemikir sistemik yang mendambakan efisiensi dan kesetaraan dalam hunian.",
-                location: "Struktur Radikal, Infill Building, atau Jembatan Penghubung",
+                desc: "Kamu adalah pemikir sistemik yang mendambakan efisiensi dan kesetaraan dalam hunian.",
+                location: "Zona Inovasi, Struktur Mentah, Lahan Kosong, atau Titik-titik Penghubung",
                 surplus: {
                     status:       "Architect of Justice",
                     legoLabel:    "Merah (Cerah)",
@@ -328,36 +357,36 @@
             { title: "Persona (Identitas)", sub: "Mengenali bagaimana kamu memandang rumah sebagai simbol status dan keberadaan di tengah kota." },
             { title: "Shadow (Beban di Kota)", sub: "Mengukur beban mental dan fisik yang kamu tanggung akibat jarak dan sistem kota." },
             { title: "Anima (Aspirasi Hidup)", sub: "Mengeksplorasi kebutuhan esensial dan ruang intim di dalam hunian." },
-            { title: "Self (Sikap & Harapan)", sub: "Menentukan visi akhir Anda terhadap masa depan hunian kolektif di Jakarta." }
+            { title: "Self (Sikap & Harapan)", sub: "Menentukan visi akhirmu terhadap masa depan hunian kolektif di Jakarta." }
         ];
         const questions = [
             // PERSONA
-            { section: 0, id: "q1", text: "Rumah impian kamu itu yang seperti apa?", options: ["Rumah tapak yang luas dan megah", "Apartemen di pusat kota yang estetik", "Rumah kecil yang privat dan tenang", "Hunian bersama yang dekat transportasi"] },
-            { section: 0, id: "q2", text: "Apa alasan utama kamu memilih lokasi rumah?", options: ["Nilai investasinya naik terus", "Dekat dengan mall dan tempat hits", "Jauh dari keramaian dan polusi", "Mudah dijangkau transportasi umum"] },
-            { section: 0, id: "q3", text: "Pentingkah punya rumah atas nama sendiri?", options: ["Sangat penting, itu harga diri!", "Penting, tapi kenyamanan nomor satu", "Gak terlalu, yang penting bisa tenang", "Gak masalah sewa, asal sistemnya adil"] },
-            { section: 0, id: "q4", text: "Kalau punya uang 1 Miliar, buat apa?", options: ["Beli tanah di pinggiran Jakarta", "Sewa apartemen mewah & jalan-jalan", "Renovasi rumah lama jadi minimalis", "Investasi ke proyek hunian komunitas"] },
-            { section: 0, id: "q5", text: "Apa arti tetangga bagi kamu?", options: ["Orang yang harus tahu status kita", "Teman buat nongkrong dan berbagi", "Cukup tahu saja, jangan ganggu privasi", "Mitra untuk mengelola fasilitas bersama"] },
+            { section: 0, id: "q1",  text: "Seperti apa rumah impianmu?",                       options: ["Rumah tapak luas & megah", "Apartemen pusat kota estetik", "Rumah kecil privat & tenang", "Hunian modular yang memudahkan"] },
+            { section: 0, id: "q2",  text: "Alasan utama pilih lokasi rumah?",                   options: ["Nilai investasi naik terus", "Dekat mall & tempat hits", "Jauh dari ramai & polusi", "Area eksplorasi nya banyak"] },
+            { section: 0, id: "q3",  text: "Pentingkah rumah atas nama sendiri?",                options: ["Sangat penting, itu nilai diri", "Penting, kenyamanan nomor satu", "Gak terlalu, yang penting tenang", "Kedua, setelah jaminan nya jelas"] },
+            { section: 0, id: "q4",  text: "Kalau punya uang 1 Miliar, buat apa?",              options: ["Beli tanah di pinggiran JKT", "Sewa apartemen mewah & jalan-jalan", "Renovasi rumah minimalis", "Bangun hunian bertenaga mandiri di kota"] },
+            { section: 0, id: "q5",  text: "Apa arti tetangga bagi kamu?",                       options: ["Orang yg harus tahu status kita", "Teman buat nongkrong & berbagi", "Cukup tahu saja, jangan ganggu", "Kolaborator sistem perubahan"] },
 
             // SHADOW
-            { section: 1, id: "q6", text: "Bagaimana perasaanmu soal macet 3 jam?", options: ["Risiko hidup sukses, nikmati saja", "Menyebalkan, bikin gak produktif", "Bikin stres dan mengganggu mental", "Bukti nyata kegagalan sistem kota"] },
-            { section: 1, id: "q7", text: "Apa ketakutan terbesarmu di Jakarta?", options: ["Gak punya aset saat hari tua", "Ketinggalan tren dan pergaulan", "Kehilangan waktu tenang dan privasi", "Melihat kota semakin gak manusiawi"] },
-            { section: 1, id: "q8", text: "Kenapa kamu memaksakan tinggal di kota?", options: ["Demi gengsi dan status sosial", "Takut kesepian kalau di desa", "Terpaksa karena urusan kerjaan", "Ingin berkontribusi buat perubahan"] },
-            { section: 1, id: "q9", text: "Risiko apa yang paling kamu hindari?", options: ["Harga properti yang mendadak jatuh", "Lingkungan yang terlihat kumuh", "Interaksi sosial yang melelahkan", "Ketimpangan sosial yang makin lebar"] },
-            { section: 1, id: "q10", text: "Apa yang kamu lakukan saat merasa capek?", options: ["Pamer pencapaian di media sosial", "Cari hiburan di pusat perbelanjaan", "Mengurung diri di dalam kamar", "Diskusi solusi bareng komunitas"] },
+            { section: 1, id: "q6",  text: "Perasaanmu soal macet 3 jam?",                       options: ["Risiko hidup sukses, nikmati", "Menyebalkan, gak produktif", "Bikin stres & ganggu mental", "Anomali sistem yang harus DIUBAH!"] },
+            { section: 1, id: "q7",  text: "Ketakutan terbesarmu di Jakarta?",                   options: ["Gak punya aset saat hari tua", "Ketinggalan tren & pergaulan", "Kehilangan waktu tenang", "Terjebak di sistem kuno"] },
+            { section: 1, id: "q8",  text: "Kenapa memaksakan tinggal di kota?",                 options: ["Demi gengsi & status sosial", "Takut kesepian kalau di desa", "Terpaksa karena kerjaan", "Mencari perspektif dan cara hidup baru"] },
+            { section: 1, id: "q9",  text: "Risiko apa yang paling kamu hindari?",               options: ["Harga properti mendadak jatuh", "Lingkungan yang terlihat kumuh", "Interaksi sosial yang lelah", "Hidupnya stagnan"] },
+            { section: 1, id: "q10", text: "Apa yang dilakukan saat capek?",                     options: ["Pamer pencapaian di medsos", "Cari hiburan di perbelanjaan", "Mengurung diri di dalam kamar", "Ngide inovasi yang bikin semangat bareng"] },
 
             // ANIMA
-            { section: 2, id: "q11", text: "Bisakah kamu bahagia di rumah 36m²?", options: ["Gak mungkin, sempit banget!", "Bisa, asal desainnya keren", "Bisa banget, asal sunyi", "Sangat bisa kalau fasilitasnya publik"] },
-            { section: 2, id: "q12", text: "Barang apa yang wajib ada di rumah?", options: ["Barang bermerk yang mahal", "Dekorasi unik hasil karya seni", "Kasur dan bantal paling empuk", "Alat masak/kerja untuk bersama"] },
-            { section: 2, id: "q13", text: "Pendapatmu tentang Sharing (Co-living)?", options: ["Gak sudi, privasi itu mutlak!", "Seru kalau bareng teman selevel", "Oke saja kalau menghemat biaya", "Inilah solusi masa depan kota"] },
-            { section: 2, id: "q14", text: "Apa yang bikin kamu merasa 'pulang'?", options: ["Pagar tinggi dan gerbang mewah", "Suasana cafe yang hangat", "Kebun kecil yang asri", "Sapaan ramah tetangga sekitar"] },
-            { section: 2, id: "q15", text: "Gedung tua terbengkalai, enaknya jadi apa?", options: ["Hancurkan, bangun mall baru!", "Jadi museum atau galeri seni", "Biarkan jadi ruang terbuka hijau", "Renovasi jadi hunian terjangkau"] },
+            { section: 2, id: "q11", text: "Bisakah bahagia di rumah 36m²?",                    options: ["Gak mungkin, sempit banget!", "Bisa, asal desainnya keren", "Bisa banget, asal sunyi", "Bisa kalau teknologinya terasa efisien"] },
+            { section: 2, id: "q12", text: "Barang apa yang wajib ada di rumah?",                options: ["Barang bermerk yang mahal", "Dekorasi unik karya seni", "Kasur dan bantal paling empuk", "Fitur otomasi seluruh fungsi ruang"] },
+            { section: 2, id: "q13", text: "Pendapatmu tentang Co-living?",                      options: ["Gak sudi, privasi itu mutlak!", "Seru kalau bareng teman selevel", "Oke saja kalau hemat biaya", "Solusi supaya hunian merata"] },
+            { section: 2, id: "q14", text: "Apa yang bikin kamu merasa 'pulang'?",               options: ["Pagar tinggi & gerbang mewah", "Suasana cafe yang hangat", "Kebun kecil yang asri", "Ruang eksploratif yang menunjang inovasi"] },
+            { section: 2, id: "q15", text: "Gedung tua, enaknya jadi apa?",                      options: ["Hancurkan, bangun mall baru!", "Jadi museum atau galeri seni", "Biarkan jadi ruang terbuka hijau", "Jadi titik pusat perubahan"] },
 
             // SELF
-            { section: 3, id: "q16", text: "Rela bayar pajak tinggi demi MRT gratis?", options: ["Gak rela! Uangku buat asetku", "Rela, biar saya makin mobile", "Rela, asal lingkungan makin tenang", "Sangat rela, itu prinsip keadilan"] },
-            { section: 3, id: "q17", text: "Apa warisan terbaikmu untuk kota?", options: ["Gedung tinggi atas namaku", "Budaya kreatif yang dinamis", "Kelestarian alam yang terjaga", "Sistem hidup bersama yang adil"] },
-            { section: 3, id: "q18", text: "Pilih: Punya rumah di pinggir atau sewa di tengah?", options: ["Punya rumah di pinggir (Milik!)", "Sewa di tengah (Gaya Hidup!)", "Punya rumah kecil (Privasi!)", "Sewa di tengah (Kolektif!)"] },
-            { section: 3, id: "q19", text: "Bagaimana cara mengatasi krisis lahan?", options: ["Biarkan pasar yang mengatur", "Bangun apartemen mewah vertikal", "Hargai setiap jengkal ruang hijau", "Hapus kepemilikan tanah tunggal"] },
-            { section: 3, id: "q20", text: "Apa tugas utama kamu sebagai warga?", options: ["Menjadi kaya dan mandiri", "Menjadi kreatif dan inspiratif", "Menjaga ketenangan diri", "Membangun kota yang inklusif"] }
+            { section: 3, id: "q16", text: "Rela pajak tinggi demi MRT gratis?",                 options: ["Fokus untuk aset sendiri dulu", "Rela kalo menunjang mobilitas", "Rela, asal lingkungan tenang", "Sistemnya terintegrasi dulu deh"] },
+            { section: 3, id: "q17", text: "Apa warisan terbaik menurutmu untuk kota?",          options: ["Gedung tinggi", "Budaya kreatif", "Kelestarian alam", "Sistem hunian yang merata dan visioner"] },
+            { section: 3, id: "q18", text: "Skenario paling masuk akal bagi masa depanmu?",      options: ["Beli rumah tapak di pinggiran", "Sewa apartemen di pusat kota", "Bangun rumah sendiri meski kecil", "Sewa hunian kolektif di tengah kota"] },
+            { section: 3, id: "q19", text: "Bagaimana mengatasi krisis lahan?",                  options: ["Biarkan pasar yang mengatur", "Bangun apartemen mewah vertikal", "Hargai setiap jengkal ruang hijau", "Hapus aturan fungsi tanah tunggal"] },
+            { section: 3, id: "q20", text: "Apa tugas utama kamu sebagai warga?",                options: ["Menjadi kaya dan mandiri", "Menjadi kreatif dan inspiratif", "Menjaga ketenangan diri", "Membangun kota yang transformatif"] }
         ];
 
         function startGame() {
@@ -399,25 +428,25 @@
                 card.id = `card-${q.id}`;
                 card.className = "space-y-6";
                 card.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 text-slate-500 font-black text-sm">${idx+1}</span>
-                        <h3 class="text-2xl font-bold text-white/90">${q.text}</h3>
+                    <div class="flex items-start gap-3 sm:gap-4">
+                        <span class="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-slate-800 text-slate-500 font-black text-xs sm:text-sm">${idx+1}</span>
+                        <h3 class="text-lg sm:text-2xl font-bold text-white/90 pt-1">${q.text}</h3>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 ml-14">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 ml-11 sm:ml-14">
                         ${q.options.map((opt, i) => {
                             const type = String.fromCharCode(65 + i);
                             const beh = coinBehavior[type];
                             return `
                                 <div class="relative">
                                     <input type="radio" name="${q.id}" id="${q.id}${type}" value="${type}" class="hidden" onchange="onAnswer('${q.id}', '${type}')">
-                                    <label for="${q.id}${type}" class="flex items-start justify-between p-5 rounded-2xl border border-white/5 bg-slate-800/20 card-interaction cursor-pointer gap-3">
+                                    <label for="${q.id}${type}" class="flex items-start justify-between p-4 sm:p-5 rounded-2xl border border-white/5 bg-slate-800/20 card-interaction cursor-pointer gap-2 sm:gap-3">
                                         <div class="flex flex-col gap-1 flex-1">
-                                            <span class="text-sm font-semibold text-slate-300">${opt}</span>
-                                            <span class="text-[10px] font-medium" style="color:${beh.color}88">${beh.hint}</span>
+                                            <span class="text-xs sm:text-sm font-semibold text-slate-300">${opt}</span>
+                                            <span class="text-[10px] font-medium" style="color:${beh.surplusColor}88">${beh.hint}</span>
                                         </div>
                                         <div class="flex flex-col items-end gap-1 shrink-0">
                                             <span class="text-[10px] font-black text-red-400 bg-red-400/10 px-2 py-1 rounded-md border border-red-400/20">-${costs[type]} ₿</span>
-                                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border" style="color:${beh.color};border-color:${beh.color}40;background:${beh.color}15">${beh.label}</span>
+                                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border" style="color:${beh.surplusColor};border-color:${beh.surplusColor}40;background:${beh.surplusColor}15">${beh.label}</span>
                                         </div>
                                     </label>
                                 </div>
@@ -461,6 +490,16 @@
             coinEl.innerText = remaining;
             coinEl.style.color = remaining < 0 ? '#ef4444' : '#eab308';
 
+            // Sync mobile sticky bar
+            const mob = document.getElementById('currentCoinsMobile');
+            if (mob) { mob.innerText = remaining; mob.style.color = remaining < 0 ? '#ef4444' : '#eab308'; }
+            const mobDot = document.getElementById('coinStatusDotMobile');
+            if (mobDot) mobDot.style.background = isSurplus ? '#22c55e' : '#ef4444';
+            const mobPT = document.getElementById('progressTextMobile');
+            if (mobPT) mobPT.innerText = `${count}/${questions.length}`;
+            const mobPB = document.getElementById('progressBarMobile');
+            if (mobPB) mobPB.style.width = `${(count/questions.length)*100}%`;
+
             // Live surplus/deficit badge on sidebar
             const statusDot = document.getElementById('coinStatusDot');
             const statusLabel = document.getElementById('coinStatusLabel');
@@ -480,7 +519,10 @@
                 document.getElementById('archName').innerText = archetypes[top].name;
                 document.getElementById('archName').style.color = archetypes[top].color;
                 document.getElementById('archStatus').innerText = "Kecenderungan: " + archetypes[top].name + " — " + archetypes[top].focus;
-                document.getElementById('sectionBadge').innerText = sections[questions[count-1 < 0 ? 0 : count-1].section].title;
+                const secTitle = sections[questions[count-1 < 0 ? 0 : count-1].section].title;
+                document.getElementById('sectionBadge').innerText = secTitle;
+                const mobBadge = document.getElementById('sectionBadgeMobile');
+                if (mobBadge) mobBadge.innerText = secTitle.split(' ')[0]; // short label on mobile
             }
         }
 
