@@ -191,13 +191,21 @@
             <div class="space-y-4 sm:space-y-5">
                 <div class="text-center lg:text-left">
                     <div id="resIcon" class="text-6xl sm:text-8xl mb-2 sm:mb-3 floating inline-block"></div>
-                    <div class="flex items-baseline gap-2 sm:gap-3 flex-wrap">
+
+                    <!-- Nama + Badge — center di mobile -->
+                    <div class="flex items-baseline justify-center lg:justify-start gap-2 sm:gap-3 flex-wrap">
                         <h1 id="resTitle" class="text-3xl sm:text-5xl font-black italic uppercase leading-none"></h1>
                         <span id="resCoinStatus" class="text-[10px] sm:text-xs font-black tracking-widest px-2 sm:px-3 py-1 rounded-full border border-current"></span>
                     </div>
-                    <p id="resDesc" class="text-slate-500 text-xs sm:text-sm leading-relaxed mt-3 border-t border-white/5 pt-3"></p>
-                    <p id="resSubStatus" class="text-base sm:text-lg font-bold mt-2 italic"></p>
-                    <p id="resImpact" class="text-xs sm:text-sm text-slate-400 mt-1 leading-snug"></p>
+
+                    <!-- Deskripsi arketipe langsung di bawah nama -->
+                    <p id="resDesc" class="text-slate-400 text-xs sm:text-sm leading-relaxed mt-2"></p>
+
+                    <!-- Garis pemisah, lalu sub-status + impact -->
+                    <div class="border-t border-white/5 mt-3 pt-5">
+                        <p id="resSubStatus" class="text-base sm:text-lg font-bold italic"></p>
+                        <p id="resImpact" class="text-xs sm:text-sm text-slate-500 mt-0.5 leading-snug"></p>
+                    </div>
                 </div>
 
                 <!-- Sisa Koin + Lokasi -->
@@ -266,7 +274,7 @@
             A: {
                 name: "The Savior", icon: "👑", color: "#eab308",
                 focus: "Stabilitas & Nilai Aset",
-                desc: "Kamu  memandang rumah sebagai pelindung nilai dan simbol keberhasilan hidup.",
+                desc: "Kamu memandang rumah sebagai pelindung nilai dan simbol keberhasilan hidup.",
                 location: "Zona High-Value / Sky-Garden, Pusat Bisnis, atau Area Investasi",
                 surplus: {
                     status:       "The Urban Patron",
@@ -302,7 +310,7 @@
                     status:       "The Aesthetic Hoarder",
                     legoLabel:    "Biru (Solid/Dull)",
                     legoColor:    "#1e3a5f",
-                    impact:       "Ruang sempit yang penuh barang konsumsi.",
+                    impact:       "Ruang sempit yang penuh barang pakai.",
                     coinProfile:  "The Hedonist",
                     coinDesc:     "Terjebak siklus konsumsi sesaat yang menguras masa depan."
                 }
@@ -317,7 +325,7 @@
                     legoLabel:    "Ungu (Neon/Glow)",
                     legoColor:    "#c084fc",
                     impact:       "Berhasil 'membeli' waktu dengan lokasi cerdas.",
-                    coinProfile:  "The Mindful",
+                    coinProfile:  "The Guardian",
                     coinDesc:     "Disiplin menjaga cadangan masa depan tanpa mengorbankan kualitas hidup."
                 },
                 deficit: {
